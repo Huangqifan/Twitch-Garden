@@ -6,7 +6,7 @@ public class Commands : MonoBehaviour
 {
 	public GameObject Weeds;
 	public GameObject Flowers; 
-	public Sprite FlowerSprite; 
+	public Sprite FlowerSprite;
 	private int WeedsCount; 
 	private int FlowerCount; 
 	private int WaterCount; 
@@ -19,7 +19,7 @@ public class Commands : MonoBehaviour
     {
         WeedsCount = 0; 
         FlowerCount = 0; 
-        WaterCount = 0; 
+        WaterCount = 0;
     }
 
     // Update is called once per frame
@@ -41,7 +41,6 @@ public class Commands : MonoBehaviour
         }
         
     }
-
     public void WaterFlower()
     {
     int i = 0;
