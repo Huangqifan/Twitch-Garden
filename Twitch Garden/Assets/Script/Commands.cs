@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Commands : MonoBehaviour
 {
+    [SerializeField] Animator tree_animator;
 	public GameObject Weeds;
 	public GameObject Flowers; 
 	public Sprite FlowerSprite;
