@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+
 public class Commands : MonoBehaviour
 {
 	public GameObject Weeds;
-	public GameObject Flowers; 
-	public Sprite FlowerSprite;
-    [SerializeField] Animator animator;
+    public List<flower> Flowers_collection = new List <flower>();
+    public Sprite FlowerSprite;
+    [SerializeField] Animator tree_animator;
+    [SerializeField] Animator mushroom_animator;
+    [SerializeField] GameObject timer;
     private bool waiting; 
 
 	private int WeedsCount; 
@@ -21,54 +26,135 @@ public class Commands : MonoBehaviour
     public int Wcount = 0; 
     public int Kcount = 0; 
 
-    public int Wrequire = 5; 
-    public int Frequire = 5; 
-    public int Prequire = 5; 
+    public int Wrequire = 0; 
+    public int Frequire = 0; 
+    public int Prequire = 0; 
 
     private float weedcounter; 
-    private float weedinterval = 30.0f; 
+   [SerializeField] float weedinterval = 10.0f; 
 
     private float flowercounter; 
-    private float flowerinterval = 30.0f; 
-
-
-
+    private float flowerinterval = 10.0f;
+    private float flower_timer;
+    private GameObject water_timer_obj;
+    private int flower_index;
+    private int num_to_plant;
+    private int weed_index;
+    
+    void find_next_plant_index()
+    {
+        num_to_plant = 0;
+        List<int> ids = new List<int>();
+        foreach (var f in Flowers_collection)
+        {
+            ids.Add(f.getId());
+        }
+        ids.Sort();
+        foreach (var i in ids)
+        {
+            if (i == num_to_plant + 1)
+                num_to_plant++;
+            else
+                break;
+        }
+        Debug.Log(num_to_plant);
+    }
     // Start is called before the first frame update
     void Start()
     {
-        weedcounter = weedinterval; 
+        weedcounter = weedinterval;
+        weed_index = 0;
         flowercounter = flowerinterval; 
         WeedsCount = 0; 
         FlowerCount = 0; 
         WaterCount = 0;
+        flower_timer = -1.0f;
+        num_to_plant = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-    	if (Input.GetKeyDown("p"))
+        List<flower> new_collection = new List<flower>();
+        foreach (var f in Flowers_collection)
         {
-           ClearWeed();
-            weedcounter = weedinterval; 
-            flowercounter = flowerinterval; 
+            if (f.to_destroy)
+            {
+                flower.Destroy(f);
+                
+            }
+            else
+            {
+                new_collection.Add(f);
+                f.update();
+            }
+        }
+        Flowers_collection = new_collection;
+        
 
- 
+        if (Input.GetKeyDown("p"))
+        {
+            ClearWeed();
+            weedcounter = weedinterval; 
+            //flowercounter = flowerinterval; 
+        }
+
+        if (Input.GetKeyDown("1"))
+        {
+            flower_index = 0;
+        }
+
+        if (Input.GetKeyDown("2"))
+        {
+                flower_index = 1;
+        }
+
+        if (Input.GetKeyDown("3"))
+        { 
+                flower_index = 2;
+        }
+
+        if (Input.GetKeyDown("4"))
+        {
+                flower_index = 3;
+        }
+
+        if (Input.GetKeyDown("5"))
+        {
+                flower_index = 4;
+        }
+        if (Input.GetKeyDown("6"))
+        {
+            flower_index = 5;
+        }
+        if (Input.GetKeyDown("7"))
+        {
+            flower_index = 6;
+        }
+        if (Input.GetKeyDown("8"))
+        {
+            flower_index = 7;
+        }
+        if (Input.GetKeyDown("9"))
+        {
+            flower_index = 8;
         }
 
         if (Input.GetKeyDown("f"))
         {
         	PlantFlower(); 
             weedcounter = weedinterval; 
-
-
         }
 
         if (Input.GetKeyDown("w"))
         {
-        	WaterFlower(); 
-            weedcounter = weedinterval; 
-            flowercounter = flowerinterval; 
-
+        	WaterFlower(flower_index); 
+            //weedcounter = weedinterval; 
+            //flowercounter = flowerinterval; 
+        }
+        if(Input.GetKeyDown("t"))
+        {
+            UnWaterFlower(flower_index);
         }
         if (Input.GetKeyDown("k"))
         {
@@ -77,6 +163,10 @@ public class Commands : MonoBehaviour
             weedcounter = weedinterval; 
             
         }
+        if (Input.GetKeyDown("m"))
+        {
+            touchMushroom();
+        }
         if (weedcounter < 0.0f)
         {
             GrowGrass(); 
@@ -84,208 +174,192 @@ public class Commands : MonoBehaviour
         }
         if (weedcounter < 0.0f)
         {
-            WitherFlower(); 
-            weedcounter = weedinterval; 
+            //WitherFlower(); 
+            //weedcounter = weedinterval; 
         }
         else
         {
             weedcounter = weedcounter - Time.deltaTime;
-            flowercounter = flowercounter - Time.deltaTime; 
+            //flowercounter = flowercounter - Time.deltaTime; 
 
         }
         
     }
-
+    public void touchMushroom()
+    {
+        mushroom_animator.SetTrigger("touch");
+    }
     public void TreeChop()
     {
         Kcount ++; 
-        if (Kcount > 10 && Kcount < 15)
+        if (Kcount > 2 && Kcount < 5)
         {
-        animator.SetTrigger("Start");
+        tree_animator.SetTrigger("Start");
         }
-        if (Kcount > 15&& Kcount < 20)
+        if (Kcount > 5&& Kcount < 7)
         {
-            animator.SetTrigger("TreeFall02");
+            tree_animator.SetTrigger("Treefall02");
         }
-         if (Kcount > 20 && Kcount < 25)
+         if (Kcount > 7 && Kcount < 10)
         {
-            animator.SetTrigger("Fall");
+            tree_animator.SetTrigger("Fall");
         }
         if (Kcount > 25 && Kcount < 30)
         {
-            animator.SetTrigger("04");
+            tree_animator.SetTrigger("04");
         }
         if (Kcount > 30 && Kcount < 35)
         {
-            animator.SetTrigger("05");
+            tree_animator.SetTrigger("05");
         }
         if (Kcount > 35 && Kcount < 40)
         {
-            animator.SetTrigger("06");
+            tree_animator.SetTrigger("06");
         }
 
 
     }
 
-    public void WaterFlower()
+
+    public void WaterFlower(int flower_ind)
     {
-    int i = 0;
-    Wcount ++; 
-
-
-
-    //Array to hold all child obj
-    GameObject[] allChildren = new GameObject[Flowers.transform.childCount];
-
-    //Find all child obj and store to that array
-    foreach (Transform child in Flowers.transform)
-    {
-    	Debug.Log(child.gameObject); 
-        allChildren[i] = child.gameObject;
-        i += 1;
-    }
-
-    if (i > flowermax)
-    {
-    	flowermax = i; 
-    }
-
-        if (Wcount > Wrequire)
+        
+        foreach (var f in Flowers_collection)
         {
-        Wrequire = Wrequire + 5; 
-        if (WaterCount < flowermax)
-        {
-    	   if( allChildren[WaterCount].active)
-    	   {
-    	   	Debug.Log(allChildren[WaterCount]); 
-    	   	allChildren[WaterCount].GetComponent<SpriteRenderer>().sprite = FlowerSprite;
-            //change to set trigger for animator later 
-    	   	WaterCount++; 
-    	   }
+            if (f.getId() == flower_ind +1)
+            {
+                if (f.getState() == state.PLANTED)
+                {
+                    f.setTime(0.0f);
+                    f.increment_water_level();
+                }
+            }
         }
+        
+    }
+
+
+    public void UnWaterFlower(int flower_ind)
+    {
+        foreach (var f in Flowers_collection)
+        {
+            if (f.getId() == flower_ind + 1)
+            {
+                if (f.getState() != state.SEED)
+                {
+                    if (f.get_water_level() > 0)
+                    {
+                        f.setTime(0.0f);
+                        f.decrement_water_level();
+                    }
+                }
+            }
         }
     }
 
 
     public void PlantFlower()
     {
-    int i = 0;
-    Fcount ++; 
-    //Array to hold all child obj
-    GameObject[] allChildren = new GameObject[Flowers.transform.childCount];
-
-    //Find all child obj and store to that array
-    foreach (Transform child in Flowers.transform)
-    {
-        allChildren[i] = child.gameObject;
-        i += 1;
+        find_next_plant_index();
+        flower f = (flower)flower.CreateInstance("flower");
+        Flowers_collection.Add(f);
+        f.setId(num_to_plant);
+        f.setState(state.PLANTED);
+            
+            
+        
     }
-
-    if (i > flowermax)
-    {
-    	flowermax = i; 
-    }
-
-    if (Fcount > Frequire)
-    {
-    Frequire = Frequire + 5; 
-    if (FlowerCount < flowermax)
-    {
-    allChildren[FlowerCount].SetActive(true);
-    }
-
-
-    FlowerCount++; 
-
-    }
-}
 
     public void ClearWeed()
 	{
-    int i = 0;
-    Pcount++; 
 
-    //Array to hold all child obj
-    GameObject[] allChildren = new GameObject[Weeds.transform.childCount];
+        int i = 0;
+        Pcount++;
+        WeedsCount++;
+        //Array to hold all child obj
+        GameObject[] allChildren = new GameObject[Weeds.transform.childCount];
 
-    //Find all child obj and store to that array
-    foreach (Transform child in Weeds.transform)
-    {
-        allChildren[i] = child.gameObject;
-        i += 1;
+        //Find all child obj and store to that array
+        foreach (Transform child in Weeds.transform)
+        {
+            if (child.gameObject.activeSelf)
+            {
+                allChildren[i] = child.gameObject;
+                i += 1;
+            }
+        }
+        
+        if (Pcount > Prequire)
+        {
+            Prequire++;
+            
+            
+                DestroyImmediate(allChildren[0]);
+                
+            
+        }
+
+        
+
     }
-
-    if (i > maxi)
-    {
-    	maxi = i; 
-    }
-
-    if (Pcount > Prequire)
-    {
-    Prequire = Prequire + 5; 
-    if (WeedsCount < maxi)
-    DestroyImmediate(allChildren[0]);
-    }
-
-    WeedsCount++; 
-
-	}
 
     public void GrowGrass()
     {
-    int i = 0;
+        int i = 0;
 
-    //Array to hold all child obj
-    GameObject[] allChildren = new GameObject[Weeds.transform.childCount];
+        //Array to hold all child obj
+        GameObject[] allChildren = new GameObject[Weeds.transform.childCount];
 
-    //Find all child obj and store to that array
-    foreach (Transform child in Weeds.transform)
+        //Find all child obj and store to that array
+        foreach (Transform child in Weeds.transform)
+        {
+            allChildren[i] = child.gameObject;
+            i += 1;
+        }
+
+        if (i > maxi)
+        {
+            maxi = i;
+        }
+        if (weed_index < 5)
+        {
+            allChildren[weed_index++].SetActive(true);
+        }
+        
+
+
+    }
+
+    /*public void WitherFlower()
     {
-        allChildren[i] = child.gameObject;
-        i += 1;
-    }
+        int i = 0;
 
-    if (i > maxi)
-    {
-        maxi = i; 
-    }
+        //Array to hold all child obj
+        GameObject[] allChildren = new GameObject[Weeds.transform.childCount];
 
-    allChildren[Random.Range(0,maxi)].SetActive(true);
-    print("grass grow"); 
+        //Find all child obj and store to that array
+        foreach (Transform child in Weeds.transform)
+        {
+            allChildren[i] = child.gameObject;
+            i += 1;
+        }
 
+        if (i > maxi)
+        {
+            maxi = i;
+        }
 
-    }
-
-     public void WitherFlower()
-    {
-    int i = 0;
-
-    //Array to hold all child obj
-    GameObject[] allChildren = new GameObject[Flowers.transform.childCount];
-
-    //Find all child obj and store to that array
-    foreach (Transform child in Weeds.transform)
-    {
-        allChildren[i] = child.gameObject;
-        i += 1;
-    }
-
-    if (i > maxi)
-    {
-        maxi = i; 
-    }
-
-    allChildren[Random.Range(0,maxi)].SetActive(false);
-    print("flower wither"); 
+        allChildren[Random.Range(0, maxi)].SetActive(false);
+        print("flower wither");
 
 
-    }
+    }*/
 
     IEnumerator wait()
     {
         waiting = true;
         yield return new WaitForSeconds(10.0f);
-        animator.SetTrigger("Regen");
+        tree_animator.SetTrigger("Regen");
         waiting = false;
 
     }
