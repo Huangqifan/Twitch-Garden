@@ -11,6 +11,12 @@ public class GeneralEvent : MonoBehaviour
 	public string PressKey; 
 	public int AnimationCounter; 
 	public Vector3 ObjectLocation; 
+    public bool isDay; 
+    public bool NightShift; 
+    public int AnimationNightCounter; 
+    public int NightShiftRequired; 
+
+
 
 	private GameObject Object; 
 
@@ -19,6 +25,7 @@ public class GeneralEvent : MonoBehaviour
     {
     	TimeCount = 0; 
     	AnimationCounter = 0; 
+        AnimationNightCounter = 0;
     	Object = Instantiate(Resources.Load<GameObject>("Prefabs/"+ ObjectName), ObjectLocation, Quaternion.identity);
         ObjectAnimator = Object.GetComponent<Animator> ();
     }
@@ -26,10 +33,17 @@ public class GeneralEvent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-    	if (Input.GetKeyDown(PressKey))
+        isDay = GameObject.Find("Scriptholder").GetComponent<DayNight>().IsDay;
+
+    	if (Input.GetKeyDown(PressKey) && isDay)
     	{
     		Interact(); 
     	}
+        if (!isDay && NightShift && AnimationCounter > NightShiftRequired )
+        {
+            Result(); 
+        }
+
         
     }
 
@@ -49,5 +63,10 @@ public class GeneralEvent : MonoBehaviour
     		ObjectAnimator.SetInteger("States", AnimationCounter); 
     		AnimationCounter ++; 
     	}
+    }
+    void Result()
+    {
+        AnimationNightCounter ++; 
+        ObjectAnimator.SetInteger("NightStates", AnimationNightCounter);
     }
 }

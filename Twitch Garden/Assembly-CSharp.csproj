@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Script\Commands.cs" />
+     <Compile Include="Assets\Script\DayNight.cs" />
      <Compile Include="Assets\Script\flower.cs" />
      <Compile Include="Assets\Script\GeneralEvent.cs" />
      <Compile Include="Assets\Script\timer.cs" />
