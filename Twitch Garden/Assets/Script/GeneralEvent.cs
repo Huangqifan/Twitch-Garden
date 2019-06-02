@@ -15,6 +15,7 @@ public class GeneralEvent : MonoBehaviour
     public bool NightShift; 
     public int AnimationNightCounter; 
     public int NightShiftRequired; 
+    public bool Shifted; 
 
 
 
@@ -28,6 +29,7 @@ public class GeneralEvent : MonoBehaviour
         AnimationNightCounter = 0;
     	Object = Instantiate(Resources.Load<GameObject>("Prefabs/"+ ObjectName), ObjectLocation, Quaternion.identity);
         ObjectAnimator = Object.GetComponent<Animator> ();
+        Shifted = false; 
     }
 
     // Update is called once per frame
@@ -39,7 +41,7 @@ public class GeneralEvent : MonoBehaviour
     	{
     		Interact(); 
     	}
-        if (!isDay && NightShift && AnimationCounter > NightShiftRequired )
+        if (!isDay && NightShift && AnimationCounter > NightShiftRequired && !Shifted)
         {
             Result(); 
         }
@@ -68,5 +70,6 @@ public class GeneralEvent : MonoBehaviour
     {
         AnimationNightCounter ++; 
         ObjectAnimator.SetInteger("NightStates", AnimationNightCounter);
+        Shifted = true; 
     }
 }
