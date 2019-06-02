@@ -191,6 +191,10 @@ MonoBehaviour:
   AnimationCounter: 0
   ObjectLocation: {x: 0, y: 0, z: 0}
   isDay: 0
+  NightShift: 1
+  AnimationNightCounter: 0
+  NightShiftRequired: 5
+  Shifted: 0
 --- !u!114 &84045746
 MonoBehaviour:
   m_ObjectHideFlags: 0

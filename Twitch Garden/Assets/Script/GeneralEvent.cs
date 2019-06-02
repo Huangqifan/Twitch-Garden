@@ -40,6 +40,7 @@ public class GeneralEvent : MonoBehaviour
     	if (Input.GetKeyDown(PressKey) && isDay)
     	{
     		Interact(); 
+    		Shifted = false; 
     	}
         if (!isDay && NightShift && AnimationCounter > NightShiftRequired && !Shifted)
         {
