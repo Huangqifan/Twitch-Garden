@@ -21,13 +21,13 @@ public class Commands : MonoBehaviour
 	private int maxi = -99; 
 	private int flowermax = -99; 
 
-    public int Pcount = 0; 
-    public int Fcount = 0; 
-    public int Wcount = 0; 
-    public int Kcount = 0; 
+    private int Pcount; 
+    private int Fcount; 
+    private int Wcount; 
+    private int Kcount; 
 
-    public int Wrequire = 0; 
-    public int Frequire = 0; 
+    public int Wrequire; 
+    private int Frequire; 
     public int Prequire = 0; 
 
     private float weedcounter; 
@@ -40,25 +40,13 @@ public class Commands : MonoBehaviour
     private int flower_index;
     private int num_to_plant;
     private int weed_index;
-    
-    void find_next_plant_index()
-    {
-        num_to_plant = 0;
-        List<int> ids = new List<int>();
-        foreach (var f in Flowers_collection)
-        {
-            ids.Add(f.getId());
-        }
-        ids.Sort();
-        foreach (var i in ids)
-        {
-            if (i == num_to_plant + 1)
-                num_to_plant++;
-            else
-                break;
-        }
-        Debug.Log(num_to_plant);
-    }
+    private int num_seeds;
+    private bool isDay;
+    public bool has_watered;
+
+    public GameObject bucket;
+    public GameObject wolves_sound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -70,27 +58,20 @@ public class Commands : MonoBehaviour
         WaterCount = 0;
         flower_timer = -1.0f;
         num_to_plant = 0;
+        has_watered = false;
+        num_seeds = 15;
+        Fcount = 0;
+        Wcount = 0;
+        Kcount = 0;
+        Frequire = 5;
+        bucket = GameObject.Find("water_bucket");
+        wolves_sound = (GameObject) Instantiate(Resources.Load("wolf"));
     }
 
     // Update is called once per frame
     void Update()
     {
-        List<flower> new_collection = new List<flower>();
-        foreach (var f in Flowers_collection)
-        {
-            if (f.to_destroy)
-            {
-                flower.Destroy(f);
-                
-            }
-            else
-            {
-                new_collection.Add(f);
-                f.update();
-            }
-        }
-        Flowers_collection = new_collection;
-        
+        isDay = GameObject.Find("Scriptholder").GetComponent<DayNight>().IsDay;
 
         if (Input.GetKeyDown("p"))
         {
@@ -152,10 +133,6 @@ public class Commands : MonoBehaviour
             //weedcounter = weedinterval; 
             //flowercounter = flowerinterval; 
         }
-        if(Input.GetKeyDown("t"))
-        {
-            UnWaterFlower(flower_index);
-        }
         if (Input.GetKeyDown("k"))
         {
             
@@ -166,6 +143,11 @@ public class Commands : MonoBehaviour
         if (Input.GetKeyDown("m"))
         {
             touchMushroom();
+        }
+        if (Input.GetKeyDown("b"))
+        {
+            if (!isDay)
+                wolves_sound.GetComponent<AudioSource>().Play();
         }
         if (weedcounter < 0.0f)
         {
@@ -191,7 +173,8 @@ public class Commands : MonoBehaviour
     }
     public void TreeChop()
     {
-        Kcount ++; 
+        Kcount ++;
+        Debug.Log("where we choppin boys");
         if (Kcount > 2 && Kcount < 5)
         {
         tree_animator.SetTrigger("Start");
@@ -223,51 +206,52 @@ public class Commands : MonoBehaviour
 
     public void WaterFlower(int flower_ind)
     {
-        
-        foreach (var f in Flowers_collection)
+        Wcount++;
+        if (isDay)
         {
-            if (f.getId() == flower_ind +1)
+            if (Wcount > Wrequire)
             {
-                if (f.getState() == state.PLANTED)
-                {
-                    f.setTime(0.0f);
-                    f.increment_water_level();
-                }
+                bucket.GetComponent<Animator>().SetTrigger("start_water");
+                has_watered = true;
+                Debug.Log("will water tonight!");
+                Wcount = 0;
+
             }
+        }
+        else
+        {
+            Wcount = 0;
         }
         
     }
 
 
-    public void UnWaterFlower(int flower_ind)
-    {
-        foreach (var f in Flowers_collection)
-        {
-            if (f.getId() == flower_ind + 1)
-            {
-                if (f.getState() != state.SEED)
-                {
-                    if (f.get_water_level() > 0)
-                    {
-                        f.setTime(0.0f);
-                        f.decrement_water_level();
-                    }
-                }
-            }
-        }
-    }
 
 
     public void PlantFlower()
     {
-        find_next_plant_index();
-        flower f = (flower)flower.CreateInstance("flower");
-        Flowers_collection.Add(f);
-        f.setId(num_to_plant);
-        f.setState(state.PLANTED);
-            
-            
+        Fcount++;
+        Debug.Log("frequire is:" + Frequire);
+        Debug.Log("fcount is:" + Fcount);
+
+        if (num_seeds > 0)
+        {
+            if (Fcount > Frequire)
+            {
+                num_seeds--;
+                Fcount = 0;
+                flower f = (flower)flower.CreateInstance("flower");
+                Flowers_collection.Add(f);
+                Debug.Log("planted!");
+                f.incState();
+            }
+        }
+        else
+        {
+            Fcount = 0;
+        }
         
+       
     }
 
     public void ClearWeed()
@@ -321,9 +305,10 @@ public class Commands : MonoBehaviour
         {
             maxi = i;
         }
-        if (weed_index < 5)
+        if (weed_index < 15)
         {
-            allChildren[weed_index++].SetActive(true);
+            allChildren[weed_index].SetActive(true);
+            allChildren[weed_index++].gameObject.GetComponent<Animator>().SetTrigger("grow");
         }
         
 

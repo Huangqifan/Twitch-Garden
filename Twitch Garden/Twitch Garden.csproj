@@ -626,8 +626,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\daynightanim.cs" />
     <Compile Include="Assets\Script\Commands.cs" />
-    <Compile Include="Assets\Script\Tree_Fall.cs" />
+    <Compile Include="Assets\Script\DayNight.cs" />
+    <Compile Include="Assets\Script\flower.cs" />
+    <Compile Include="Assets\Script\GeneralEvent.cs" />
+    <Compile Include="Assets\Script\Start.cs" />
+    <Compile Include="Assets\Script\timer.cs" />
+    <Compile Include="Assets\Script\water_level_controller.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\com.unity.collab-proxy\Editor\Resources\Styles\CollabHistoryCommon.uss" />

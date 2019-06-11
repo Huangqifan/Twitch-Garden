@@ -15,9 +15,11 @@ public class GeneralEvent : MonoBehaviour
     public bool NightShift; 
     public int AnimationNightCounter; 
     public int NightShiftRequired; 
-    public bool Shifted; 
-
-
+    public bool Shifted;
+    public bool one_time;
+    public bool able_at_night;
+    public bool limited_resources;
+    public int resource_counter;
 
 	private GameObject Object; 
 
@@ -29,7 +31,8 @@ public class GeneralEvent : MonoBehaviour
         AnimationNightCounter = 0;
     	Object = Instantiate(Resources.Load<GameObject>("Prefabs/"+ ObjectName), ObjectLocation, Quaternion.identity);
         ObjectAnimator = Object.GetComponent<Animator> ();
-        Shifted = false; 
+        Shifted = false;
+        
     }
 
     // Update is called once per frame
@@ -37,7 +40,7 @@ public class GeneralEvent : MonoBehaviour
     {
         isDay = GameObject.Find("Scriptholder").GetComponent<DayNight>().IsDay;
 
-    	if (Input.GetKeyDown(PressKey) && isDay)
+    	if (Input.GetKeyDown(PressKey) && (isDay || able_at_night))
     	{
     		Interact(); 
     		Shifted = false; 
@@ -54,8 +57,28 @@ public class GeneralEvent : MonoBehaviour
     {
     	if (Delay == 0)
     	{
-    		ObjectAnimator.SetInteger("States",AnimationCounter); 
-    		AnimationCounter ++; 
+            if (one_time)
+            {
+                ObjectAnimator.SetTrigger("Trigger");
+                Debug.Log("BOUNCE");
+            }
+            else
+            {
+                if (limited_resources)
+                {
+                    if (resource_counter > 0)
+                    {
+                        resource_counter--;
+                        ObjectAnimator.SetInteger("States", AnimationCounter);
+                        AnimationCounter++;
+                    }
+                }
+                else
+                {
+                    ObjectAnimator.SetInteger("States", AnimationCounter);
+                    AnimationCounter++;
+                }
+            }
     	}
     	else if (TimeCount < Delay)
     	{
